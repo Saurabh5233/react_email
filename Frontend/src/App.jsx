@@ -1,5 +1,6 @@
 import { useState } from 'react'
-
+import { WelcomeEmail } from './components/WelcomeEmail';
+import ReactDOMServer from "react-dom/server";
 
 function App() {
   const [form, setForm] = useState({name : "", email : "" , message : ""});
@@ -11,12 +12,17 @@ function App() {
   const  handleSubmit= async (e)=>{
     e.preventDefault();
     setStatus('Sending....');
+    const emailHtml = ReactDOMServer.renderToStaticMarkup(
+      <WelcomeEmail name={form.name} message={form.message} />
+    );
     try{
+
       const res = await fetch(`${API}/send-email`,{
         method : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify({name: form.name, email: form.email,message : form.message, html: emailHtml}),
       });
+
       const data = await res.json();
       setStatus(data.message);
       setForm({name : "", email : "" , message : ""});

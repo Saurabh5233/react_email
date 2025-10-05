@@ -21,8 +21,8 @@ mongoose.connect(process.env.MONGO_URI)
   })
 
 app.post('/send-email',async(req, res)=>{
-    const {name, email, message} = req.body;
-    if(!name || !email ||!message)return res.status(400).json({message: "All fields are required..."})
+    const {name, email,message, html} = req.body;
+    if(!name || !email || !message||!html)return res.status(400).json({message: "Email and HTML content are required"})
     
     try{
         const transporter = nodemailer.createTransport({
@@ -38,7 +38,7 @@ app.post('/send-email',async(req, res)=>{
             from : `"${name}" <${process.env.EMAIL_USER}>`,
             to : email,
             subject : "Message from Email App",
-            text : message,
+            html : html,
         });
 
         await Email.create({name, email, message});
